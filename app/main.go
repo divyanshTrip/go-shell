@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -39,24 +40,47 @@ func main() {
 			continue
 		}
 		if cmd == "type" {
-			if len(parts) == 1 {
-				fmt.Println()
+			_, ok := commands[parts[1]]
+			if ok == true {
+				fmt.Println(parts[1], "is a shell builtin")
+				continue
 			} else {
-				value, ok := commands[parts[1]]
-				if ok == true {
-					if value == true {
-						fmt.Println(parts[1], "is a shell builtin")
-						continue
-					} else {
-						fmt.Println(parts[1], "is not a shell builtin")
-						continue
-					}
+				path, found := searchPath(os.Getenv("PATH"), parts[1])
+				if found == true {
+					fmt.Println(parts[1] + " is " + path)
+					continue
 				} else {
 					fmt.Println(parts[1] + ": not found")
 					continue
 				}
 			}
+		} else {
+			fmt.Println(parts[0] + ": not found")
 		}
-		fmt.Println(cmd + ": not found")
 	}
+}
+
+func searchPath(path string, cmd string) (string, bool) {
+	dirs := strings.Split(path, string(os.PathListSeparator))
+	for _, dir := range dirs {
+
+		if dir == "" {
+			dir = "."
+		}
+
+		candidate := filepath.Join(dir, cmd)
+
+		info, err := os.Stat(candidate)
+		if err != nil {
+			continue
+		}
+		if info.IsDir() {
+			continue
+		}
+		if info.Mode()&0111 != 0 {
+			return candidate, true
+		}
+
+	}
+	return "", false
 }
