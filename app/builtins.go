@@ -35,6 +35,6 @@ func HandleType(s *Shell, args []string, stdout io.Writer) error {
 		fmt.Fprintf(stdout, "%s is %s\n", cmdName, path)
 		return nil
 	}
-	_, err := fmt.Fprintln(stdout, "%s : not found\n", cmdName)
+	_, err := fmt.Fprintf(stdout, "%s: not found\n", cmdName)
 	return err
 }
