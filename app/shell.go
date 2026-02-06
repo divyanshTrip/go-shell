@@ -24,6 +24,8 @@ func NewShell() *Shell {
 		"echo": HandleEcho,
 		"exit": HandleExit,
 		"type": HandleType,
+		"pwd":  HandlePwd,
+		"cd":   HandleCd,
 	}
 
 	return s
